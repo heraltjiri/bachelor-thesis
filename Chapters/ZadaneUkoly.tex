@@ -1,0 +1,791 @@
+\chapter{Zadané úkoly}
+
+\section{Zavedení množstevních jednotek}
+
+Systém neumožňoval definování množsevní jednotky u produktů. Všechny položky se vždy zobrazovaly s množstevní jednotkout ks - kus. Ne vždy je ale toto dostačující. V některých případech je potřeba dát zákazníkovi najevo že se produkt půjčuje po celých baleních nebo lze zakoupit na metry.
+
+\subsection{Analýza problému}
+
+Po konzultaci jsme se dohodli na následujicím řešení:
+
+\begin{itemize}
+    \item V administrační části aplikace přibyde nová záložka "Množstevní jednotky". Bude umožněno vytvářeni nových, jejich editace a odstraňování.
+    \item Na kartě editace produktu bude ve formuláři pole "Množstevní jednotka", jako výchozí bude nastavena první jednotka v pořadí.
+    \item Nastavenou jednotku je nutné zobrazit na všech částech webu (výpis produktů, detail produktů, košík) a také ve všech tiskových sestavách (exporty košíku apod.) 
+    \item Při vložení do košíku se musí jednotka propsat také do samotné položky objednávky, jednak aby se při případně budoucí změně jednotky změna nepropsala do již realizovaných objednávek a zároveň kvůli optimalizaci SQL dotazů (aby nebylo nutné provádět JOIN kvůli získání jednotky)
+    \item Pro urychlení vyplnění jednotek všech produktů bylo nutné připravit jednoduchý export produktů do excelu a následný import s upravenými jednotkami. Pokud daná jednotka při importu neexistuje, dojde nejprve k jejímu vytvoření.
+\end{itemize}
+
+\subsection{Shrnutí úkolu}
+
+Jednalo se o jednodušší úkol zaměřený spíše na seznámení se systémem a jeho zdrojovým kódem. Při realizaci jsem nanarazil na žádný větší problém. Číselník jednotek představuje pouze seznam jednotek k výběru, aby byly jednotky všude zadány konzistentním způsobem. Kvůli zachování jednoduchosti produkty ale neobsahují cizí klíč na jednotku.
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na zavedení množstevních jednotek]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 4h \\
+			Implementace číselníku jednotek & 4h \\
+			Implementace možnosti přiřazení jednotky k produktům & 8h \\
+			Implementace importu jednotek & 4h \\
+            \midrule
+            Celkem  & 20h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{Figures/mnozstevni-jednotky.png}
+    \caption{Zobrazení množstevních jednotek vedle tlačítka přidat do košíku}
+    \label{fig:enter-label}
+\end{figure}
+
+\section{Evidence fyzických kusů na skladě}
+
+Aplikace umožňuje evidovat počet kusů jednoho produktu na skladě, ale už neumožňuje evidovat jeho jednotlivé jednotlivé fyzické kusy. Požadavkem bylo především mít možnost vygenerovat seznam všech fyzických kusů daného produktu a ke každému zobrazit jeho lidsky čitelný kód a QR kód pro možnost naskenování.
+
+Tyto kódy budou v budoucnu využívány např. pro výdej a příjem z akcí, provádění inventur a další. Jde v podstatě o identifikátor, který se nalepí na produkt a bude jej poté jednoznačně identifikovat při všech prováděných operacích. V systému pak půjde zpětně dohledat na kterých akcích se tento produkt historicky nacházel, jestli a jak byl poškozený nebo kdy naposled prošel inventurou.
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item Počet kusů na skladě bude nově možné vždy pouze zvyšovat, snížení počtu bude potřeba provést speciální funkcí vyřazení.
+    \item Po zvýšení počtu kusů dojde ihned k vygenerování chybějících kusů
+    \item V administraci bude možné si stáhnout export ve formátu .xls jako podklad pro tisk na štítkovačku
+    \item Umožnit do budoucna snadno navázat na aktuální implementaci a přidat pak možnosti lepšího využití kódů (výdej, inventura)
+    \item Vytvořit funkci na vyřazení libovolného produktu (vyřazený kód se nebude zobrazovat při exportu a u produktu klesne počet kusů o 1)
+    \item Oddělit QR kódy do samostatné tabulky (aby bylo možné v budoucnu využít i jiné existující kódy které už má produkt na sobě vytištěné a ne jen ty generované systémem)
+\end{itemize}
+
+\subsection{Formát kódů}
+
+Jednotlivé kusy budou označeny trojmístným kódem za původním kódem samotného produktu. Pro produkt s kódem 1 který má 3 kusy budou existovat kusy 1-001, 1-002 a 1-003. Každý tento kus si ponese vlastní QR kód.
+
+S tímto kódem je to o něco složitější. Bylo by sice možné do QR zakódovat přímo kód daného kusu, to by ale mohlo představovat bezpečnostní riziko v případě kdy by chtěl uživatel zamaskovat ztrátu předmětu a vygeneroval si tak vlastní QR kód, kterým by nahradil ten ztracený fyzický. 
+
+Formát QR kódu se generuje následovně z několika částí, každá část je oddělena středníkem.
+
+\begin{itemize}
+    \item První 3 znaky tvoří prefix \enquote{ET\;}
+    \item Další znaky tvoří kód samotného produktu (např.  \enquote{1;}) 
+    \item Další 4 znaky tvoří kód fyzického kusu (např. \enquote{001;}
+    \item Poslední 4 znaky tvoří náhodně vygenerované písmena a čísla (např. \enquote{A2B8;}
+\end{itemize}
+
+Celkový obsah QR kódu pak může vypadat následovně: \enquote{ET;1;001;A2B8}
+
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na zavedení množstevních jednotek]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 16h \\
+			Implementace fyzických kusů & 25h \\
+            Implementace vyřazení & 25h \\
+            \midrule
+            Celkem  & 66h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+\subsection{Tisk štítků a komunikace s tiskárnou}
+
+Jakmile bylo vyřešeno textové generování kódů, bylo potřeba navrhnout, jak efektivně přenést data z databáze na papírové štítky, kterými budou opatřeny produkty. Pro tisk byla vybrána tiskárna Brother řady QL. 
+
+První zvažovanou možností komunikace byla možnost přímé komunikace aplikace s tiskárnou na nižší úrovni pomocí Brother Print SDK. \cite{brotherInformationLabel} Toto řešení by bylo určitě funkční, ale náročnost implementace velmi vysoká. Bylo by potřeba vytvořit úplně novou pomocnou aplikaci do telefonu, která by musela komunikovat s informačním systém i tiskárnou. Mobilní apliakce by sloužila především k vyhledání a výběru produktu k tisku a následně by přenesla informaci k tisku do tiskárny.
+
+Druhou, mnohem jednodušší, možností bylo využít výrobcem dodáváný software P-Touch editor. Ten umožňuje grafickou tvorbu štítků a jejich tisk. V grafickém návrhu štítků je možné vytvořit i proměnné pole, jehož hodnotu lze potom při tisku načítat z datového souboru.
+Jediné, co tedy bylo potřeba pro tuto variantu vytvořit byl export produktových kódů do souboru v excelu, který na každém řádku kromě samotného QR kódu obsahoval i další informace k zobrazení na štítku (název, umístění ve skladu, číselný kód).
+
+Z důvodu výrazně nižší časové náročnosti se vedení rozhodlo pro realizování druhé varianty. Tisk přes dodaný software je sice o něco méně komfortní, na druhou stranu již v základu nábízí daleko více možností a jakmile bude celý sklad polepený štítky, bude se tato funkce využícat spíše zřídka. 
+
+\section{Inventura}
+
+Cílem tohoto úkolu bylo vytvořit nástroj usnadňující provadění pravidelných inventur skladu. Šlo v podstatě o vytvoření komplexnější tiskové sestavy obsahující všechny produkty. Dokument se bude generovat ve dvou variantách (slepý a se zobrazeným počtem kusů) a pracovník bude mít zároveň možnost určit řazení produktů.
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item Umožnit generování PDF dokumentu s výčtem produktů
+    \item Pracovník zvolí jakou variantu dokumentu generovat
+    \item Pracovník zvolí podle jakého sloupce bude probíhat primární a sekundární řazení, a zda řadit vzestupně nebo sestupně.
+    \item Dokument se po vygenerování uloží do systému a bude zpětně dostupný k nahlédnutí. Je potřeba uložit již vygenerovaný PDF, aby do dokumentu nebyly reflektovány budoucí změny ve skladu.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/inventura-pdf.png}
+    \caption{Formulář pro generování dokumentu inventury}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{Formulář pro vytvoření dokumentu}
+
+Uživatel si dokument inventury může vygenerovat pomocí jednoduchého formuláře. Formulář byl implementován pomocí knihovny Nette Forms a formou návrhového vzoru továrna, který pro případ potřeby zajišťuje možnost znovupoužití formuláře v jiných částech aplikace. \cite{refactoringFactoryMethod}
+Vykreslení jednotlivých prvků do šablony pak již probíhá automaticky.
+
+\begin{lstlisting}[label=src:GenerateStockTakingDocumentFormFactory,caption={Továrna formuláře pro generování dokumentu s inventurou}]
+
+final class GenerateStockTakingDocumentFormFactory
+{
+    // ... Konstruktor a předání DI závislostí
+
+    public function create() {
+		$form = $this->factory->create();
+
+		$form->addSelect('type', 'Typ', [
+            StockTakingPdfFacade::TYPE_BLIND => 'Slepý',
+            StockTakingPdfFacade::TYPE_WITH_QUANTITY => 'S počtem kusů'
+        ]);
+
+        $form->addRadioList('orderPrimary', 'Řadit podle (primární)',
+            [
+                ReservationItemManager::COL_ID => 'ID',
+                ReservationItemManager::COL_DETAILS_SHELF => 'Místo',
+                ReservationItemManager::COL_TITLE => 'Název',
+            ])
+            ->setDefaultValue(ReservationItemManager::COL_ID);
+
+        $form->addRadioList('orderPrimaryDirection', 'Směr řazení (primární)',
+            [
+                'ASC' => 'Vzestupně',
+                'DESC' => 'Sestupně',
+            ])
+            ->setDefaultValue('ASC');
+
+		$form->addSubmit('send', 'Generovat');
+
+		$form->onSuccess[] = function (Form $form, $values) {
+         //  Vygenerování dokumentu
+		};
+
+		return $form;
+	}
+}
+
+
+\end{lstlisting}
+
+\section{Interaktivní inventura}
+
+Navazujícím úkolem bylo vytvoření funkcionality, která umožní provést inventuru efektivnějším způsobem za pomocí aplikace. Aplikace by měla umožnit provést inventuru všech fyzických kusů jednoho konkrétního produktu a po dokončení nabídnout volitelně fyzické kusy k vyřazení ze skladu. 
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item Vytvoření tabulek stock\_taking a stock\_taking\_item
+    \item Vytvoření API které bude využívat uživatelské rozhraní
+    \item Vytvoření jednoduchého rozhraní pro zobrazení všech produktů s možností začít inventuru a zobrazení poslední provedené inventury
+    \item Vytvoření rozhraní pro provedení inventury se skenerem a seznam naskenovaných položek
+    \item Po dokončení umožnit zadat podpis pracovníka, který inventuru provedl (prstem na displeji telefonu / tabletu)
+\end{itemize}
+
+\subsection{Skenování kódů}
+
+Načtení položky do inventury je možné na základě jejího unikátního QR kódu. Tento kód je možné načíst přímo pomocí fotoaparátu telefonu. Pro tuto část jsem použil již hotové řešení - React komponentu react-qr-scanner. 
+
+Po seznámení se základními funkcemi byla práce s touto komponentou jednoduchá a intuitivní. Při úspěšném naskenování kódu je tato informace odeslána na REST API, které ji zpracuje, rozpozná kód produktu a zařadí položku do inventury. 
+
+\subsection{Podpisové pole}
+
+Po naskenování všech položek je možné inventuru uzamknout a vytvořit prstem podpis, který se následně propíše do vygenerovaného PDF dokumentu. Pro podpisové pole jsem opět hledal vhodné již naimplementované řešení. Z dostupných variant se nakonec jako nejvhodnější jevila komponenta react-signature-canvas. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{interaktivni-inventura-podpis.png}
+    \caption{Zobrazení shrnutí inventury s možností podpisu na telefonu}
+    \label{fig:enter-label}
+\end{figure}
+
+
+\subsection{Skenování kódů externí čtečkou}
+
+Při ostrém testování se zjistilo, že skenování QR kódu telefonem je v praxi relativně pomalé a bylo potřeba vymyslet vhodnější řešení. Domluvili jsme se na možnosti skenování pomocí externí bezdrátové čtečky kódů.
+
+Z uživatelského pohledu nebylo nutné pro implementaci čtečky nic měnit. Čtečka odesílá naskenovaný text jako standardní vstup z klávesnice a jednotlivé kódy odděluje znakem Enter. Stačilo tedy upravit uživatelskou část tak aby poslouchala uživatelský vstup z klávesnice a odesílala jej stejným způsobem jako při naskenování z fotoaparátu.
+
+Při testování s čtečkou jsem narazil na několik problémů týkajících se kódování a odesílání některých neviditelných znaků. Po hlubším nastudování manuálu a několika potřebných změnách nastavení čtečky se ale vše podařilo vyřešit.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/qr-ctecka-virtuos.png}
+    \caption{Vybraná čtečka QR kódů Virtuos HW-855A}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na zavedení množstevních jednotek]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 8h \\
+			Implementace základní funkční verze & 24h \\
+            Implementace podpory externí čtečky & 8h \\
+            Testování, ladění a opravy & 8h \\
+            \midrule
+            Celkem  & 48h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+
+\section{Kalkulace}
+
+V systému se nachází objednávky v rámci kterých si zákazník může plánovat zapůjčení zboží na budoucí akci. Přidáváním položek do objednávky dochází automaticky také k blokaci produktu na daný termín na skladě.
+
+Pokud by zákazník ale chtěl pouze zjistit celkovou cenu za zapůjčení konkrétních položek na nějaký termín, nemá v současné době jinou možnost než vytvořit objednávku která již bude na daný temrín zboží blokovat.
+
+Tento problém by měly řešit kalkulace, které se budou chovat v podstatě úplně stejně jako objednávky jen s tím rozdílem, že nebudou mít nutně přesně daný termín a nebudou blokovat položky na skladě.
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item V uživatelské části vznikne nová karta kalkulace, která bude zobrazovat kalkulace daného uživatele a zároveň umožní jejich správu a vytvoření nových
+    \item Produkty v kalkulacích nebudou rezervovány ani se při přidávání produktů nebude kontrolovat skladová dostupnost
+    \item Kalkulace bude možné kopírovat a bude možné je převést na klasickou objednávku
+\end{itemize}
+
+\subsection{Databázový model}
+
+Z důvodu že kalkulace mají téměr stejnou funkcionalitu jako objednávky jsem se rozhodl využít stávající tabulku pro objednávky kterou jsem pouze obohatil o příznak signalizující že jde o kalkulaci - isCalculation. 
+Dalším požadavkém bylo, že ke kalkulacím budou mít přístup pouze uživatelé pro které bude tato funkce povolena v administračním rozhraní, pro toto bylo potřeba přidat nový příznak k tabulce s uživateli - canCreateCalculations. Zbytek databázové struktury zůstává nezměněn. 
+
+\subsection{Uživatelská část}
+
+V uživatelské části jsem vytvořil novou kartu s výpisem a možností správy nabídek. Podle zmíněného příznaky isCalculation jsem rozdělil zobrazení kalkulací a objednávek v příslušných seznamech. Toto bylo nutné provést na několika místech napříč aplikací.
+
+Pro možnost vytvoření a editace nabídek jsem vytvořil jednoduchý formulář - opět pomocí knihovny Nette Forms. Funkcionalitu vyhledávání mezi nabídkami jsem převzal z karty objednávek.
+
+Dalši změny v uživatelském rozhzraní nebylo nutné provádět. Uživatel může vytvořit kalkulaci, vybírat z nabídky produktů a vkládat produkty do této kalkulace stejně jako v případě objednávek.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{kalkulace-formular.png}
+    \caption{Formulář pro vytvoření kalkulace}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{Rezervace produktů}
+
+Aby produkty v kalkulacích nebyly rezervovány, bylo nutné upravit část kódu která se stará o vkládání položek do objednávky. Pokud systém detekuje, že přidáváme položku do kalkulace tak:
+
+\begin{itemize}
+    \item Přeskočí kontrolu dostupnosti na daný termín
+    \item Záznam v tabulce položek objednávky opatří příznakem isCalculation = 1
+\end{itemize}
+
+Část kódu která se stará o kontrolu dostupnosti ignoruje položky s nastaveným příznakem isCalculation (stejně jako ignoruje třeba položky u zrušených akcí). Příznak by síce díky vazbě na tabulku objednávek nebyl potřeba, ale vzhledem k tomu že vyhledání dostupnosti položek se někdy může stát časově nejnáročnější operací jsem se rozhodl mít tuto hodnotu v databází redundantně z důvodu lepšího výkonu.
+
+\subsection{Kopírování kalkulací a převod na akci}
+
+Možnost kopírování byla jednodušší funkcionalita, které pouze zkopíruje záznam samotné kalkulace a následně všechny její položky. Opět nedochází ke kontrole dostupnosti a výsledkem je naprosto totožná kalkulace jako ta původní.
+
+Převod kalkulace na akci je užitečná funkce v případě, že se zákazník rozhodne pro objednávku zadané kalkulace na nějaký konkrétní termín. Před převodem potřebujeme zkontrolovat skladovou dostupnost všech položek v kalkulaci, poté vytvořit novou objednávku do které převedeme všechny dostupné položky a informovat uživatele  o položkách které dostupné nejsou. Pokud jě nějaká položka dostupná pouze v částečném množštví, vložíme do objednávky aspoň toto omezené množší a opět informujeme uživatele.
+
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na kalkulace]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 8h \\
+			Implementace kalkulací & 12h \\
+            Implementace funkce pro převod kalkulace na nabídku & 16h \\
+            Testování, ladění a opravy & 8h \\
+            \midrule
+            Celkem  & 44h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+\section{Vázané produkty}
+
+Při rezervaci položek se stává, že spolu některé položky souvisejí a je žádoucí aby objednávka jednoho produktu ze skladu rezervovala i další položky v určitém možství. Cílem této funkcionality je umožnit ve správě produktů tyto pravidla nastavit a ve všech částech aplikace pak rezervovat produkty na základě těchto nastavených pravidel.
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item V administrátorském rozhraní umožnit k produktu nastavit vazbu na další produkty s možností volby počtu kusů
+    \item Při přidání produktu do objednávky se bude kontrolovat jak dostupnost hlavního produktu tak i všech provázaných prodzktů
+    \item Při přidání produktu do objednávky se společně s hlavním produktem vloží v zadaném množštví i všechy vázané produkty
+    \item Vázany produkt se v objednávce nebude zobrazovat
+    \item Při změně množství případně odebrání hlavního produktu se ve správném poměru musí změnit nebo odebrat i vázané produkty
+
+\end{itemize}
+
+\subsection{Vytváření vazeb}
+
+Ke správě vazeb mezi produkty jsem zvolil jednoduchou tabulku. Tabulka je realizovaná pomocí knihovny ublaboo/datagrid \cite{contributteContributteDatagrid} a kromě zobrazení existujících vazeb umožňuje i jejich přidávání a editaci.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{vazane-produkty.png}
+    \caption{Tabulka zobrazení vázaných produktů s možnosti editace}
+    \label{fig:enter-label}
+\end{figure}
+
+
+
+\begin{lstlisting}[label=src:GenerateStockTakingDocumentFormFactory,caption={Továrna editovatelné tabulky pro správu vazeb produktů}]
+
+<?php
+
+namespace App\Grids;
+
+use App\Model\ItemExpandsToManager;
+use App\Model\ItemPartManager;
+use App\Model\ReservationItemComponentManager;
+use App\Model\ReservationItemManager;
+use Nette;
+use Ublaboo\DataGrid\Column\Action\Confirmation\StringConfirmation;
+use Ublaboo\DataGrid\DataGrid;
+
+final class ItemExpandsToGridFactory
+{
+    use Nette\SmartObject;
+
+    public function __construct(
+        private readonly GridFactory                     $gridFactory,
+        private readonly ReservationItemManager          $reservationItemManager,
+        private readonly ItemExpandsToManager            $itemExpandsToManager,
+        private readonly Nette\Security\User             $user,
+    )
+    { }
+
+    public function create($item_id): DataGrid
+    {
+        $grid = $this->gridFactory->create();
+        $grid->setPrimaryKey(ItemExpandsToManager::COLUMN_RESERVATION_ITEM_ID_TO);
+        $grid->setDataSource(
+            $this->itemExpandsToManager
+                ->getEntities()
+                ->where(ItemExpandsToManager::COLUMN_RESERVATION_ITEM_ID, $item_id)
+        );
+
+        $inlineAdd = $grid->addInlineAdd();
+        $inlineAdd->onControlAdd[] = function(Nette\Forms\Container $container) use ($item_id) {
+            $items = $this->reservationItemManager->getEntities()->fetchAll();
+            
+            $container->addSelect('name', 'Část', $items)
+                ->setRequired('Vyberte produkt');
+
+            $container->addText('quantity', 'Množství')
+                ->setRequired('Zadejte množství')
+                ->setDefaultValue(1)
+                ->addRule(Nette\Forms\Form::INTEGER, 'Množství musí být číslo')
+                ->addRule(Nette\Forms\Form::RANGE, 'Množství musí být větší než 0', [1, NULL]);
+        };
+
+        $inlineAdd->onSubmit[] = function($values) use ($item_id) {
+            $this->itemExpandsToManager->addEntity($item_id, $values->name, $values->quantity);
+        };
+
+        $grid->addColumnText('expands_id_to', 'Kód')
+            ->setFitContent();
+
+        $grid->addColumnText('name', 'Název')
+            ->setRenderer(function ($row) {
+                return $this->reservationItemManager->getEntity($row->reservation_item_id_to)->title;
+            });
+
+        $grid->addColumnNumber('quantity', 'Množství')
+            ->setEditableCallback(function($reservation_item_id_to, $value) use ($item_id, $grid) {
+                $this->itemExpandsToManager->updateEntity($item_id, $reservation_item_id_to, [ItemExpandsToManager::COLUMN_QUANTITY => $value]);
+                $grid->redrawItem($reservation_item_id_to);
+            })
+
+            ->setEditableInputType('number');
+
+        $grid->addAction('delete', 'Smazat', 'deleteExpandsTo', ['reservation_item_id' => 'reservation_item_id', 'reservation_item_id_to' => 'reservation_item_id_to'])->setConfirmation(new StringConfirmation('Opravdu chcete odstranit tuto položku?'));
+
+
+        return $grid;
+    }
+}
+
+
+\end{lstlisting}
+
+
+\subsection{Kontrola dostupnosti a rezervace}
+
+Při ověřování dostupnosti určitého produktu je potřeba aby se produkt rozpadl na pole obsahující všechny produkty u kterých je nutné dostupnost ověřit. Dostupnost je vždy kontrolována pouze do první úrovně (tzn. řešíme pouze produkty které jsou vazbou přímo přiřazeny k hlavnímu produktu). Byl to požadavek ze zadání a navíc nemusíme řešit cyklickou závislost kdy by produkt A požadoval produkt B a ten by zároveň vyžadoval další produkt A.
+Pro účely rozpadu položky jsem vytvořil jednoduchou třídu s jedinou metodou která tuto logiku řeší. Metoda je vždy volána při každé kontrole dostupnosti přímo z třídy která má dostupnost na starosti. Tímto postupem jsem se vyhnul nutnosti měnit logiku ve více částech aplikace.
+Obdobný postup následoval při přidání položky do objednávky, kdy opět získáme pole všech položek na které se má hlavní položka rozpadnout a následně ukládáme všechny položky. K položkám navíc ukládáme ID hlavní položky, kvůli kterým byly do objednávky přidány.
+Tato informace nám umožní tyto podpoložky v objednávce skrýt a navíc ji pak využívám při další manipulaci s hlavní položkou (změna termínu, změna počtu nebo odstranění).
+
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na kalkulace]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 8h \\
+			Implementace správy vazeb produktů & 8h \\
+            Implementace kontroly dostupnosti a rezervace & 8h \\
+            Testování, ladění a opravy & 8h \\
+            \midrule
+            Celkem  & 32h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+
+\section{Skupiny produktů}
+
+Výdej produktů na akci (respektive příjem produktů z akce) probíhá skenováním kódů jednotlivých položek. Tyto kódy se pak propisují do příjmových / výdejových protokolů.
+
+Pokud ale potřebujeme vydat určitou skupinu produktů bez nutnosti ručně skenovat kódy všech produktů v této skupině hodil by se nějaký mechanismus, který by toto při výdeji umožnil. Myšlenka je dovolit skladníkovi předem předvytvořit skupiny složené z libovolného počtu produktů, vygenerovat si unikátní kód této skupiny a při výdeji naskenovat pouze tento jeden kód, který vložení všech produktů zajistí. 
+
+Použití v praxi může být např. přepravka kabelů. Každý kabel má svůj fyzický kód, ale kód na přepravce nám zajistí jednoduché přnesení celého jejího obsahu do výdejových protokolů.
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item Možnost vytvořit a spravovat libovolný počet skupin a jednoduše v nich měnit produkty
+    \item Ke každé skupině budě vygenerován QR kód, který bude možné vytisknout na štítek stejně jako v případě štítků produktů
+    \item Přidávání produktů do skupin bude umožněno naskenováním QR kódů produktů
+    \item Při výdeji / příjmu musí být tento speciální kód skupiny aplikací rozpoznán a korektně zpracován
+\end{itemize}
+
+\subsection{Implementace}
+
+Úkol jsem začal řešit opět návrhem jednoduché databázové struktury, implementace tabulky pro výpis a formulářem pro přidávání a editaci skupin. Pro správu položek ve skupině jsem vytvořil React komponentu obsahující skener a výpis položek s možností odstranění. Po úspěsném načtení je kód odeslán na API a následně jsou opět přes API znovunačteny položky k zobrazení.
+
+\begin{lstlisting}[label=src:ProductGroupScanner.js,caption={React komponenta pro správu a zobrazení položek ve skupině}]
+
+export const ProductGroupScanner = (props) => {
+    const [data, setData] = useState('');
+    const [items, setItems] = useState(null);
+
+    const getItems = () => {
+        getProductGroup(props.groupId)
+            .then((data) => {
+                setItems(data.items);
+            })
+    }
+
+    useEffect(() => {
+        getItems();
+    }, []);
+
+    const handleScan = (result, error) => {
+        if (!!result) {
+
+            setData(result?.text);
+                addProductGroupItem(props.groupId, result?.text)
+                    .then((data) =>{
+                        if (data.success) { toast.success('Položka byla přidána do skupiny.'); }
+                    })
+                    .catch((data) => {
+                        if (data) { toast.error(data); }
+                        else { toast.error('Položku nebylo možné přidat do skupiny'); }
+                    })
+                    .finally(() => {
+                        getItems();
+                    });
+        }
+    };
+
+    const handleRemove = (productId, physicalProductId, partId) => {
+        toast.promise(
+            deleteItemFromProductGroup(props.groupId, productId, physicalProductId, partId),
+            {
+                pending: "Probíhá odebrání položky",
+                success: "Položka byla odebrána z výkazu",
+                error: "Chyba při odebírání položky",
+            }
+        )
+            .then((response) => {
+                console.log(response);
+                getItems();
+            });
+    };
+
+    let itemsEl = null;
+    if (items) {
+        itemsEl = items.items.map((i) => {
+            return <ProductGroupItem key={i.id} item={i} handleRemove={handleRemove} />
+        })
+
+        if (items.items.length === 0) {
+            itemsEl = <div>V této skupině se zatím nenachází žádné položky.</div>;
+        }
+    }
+    else {
+        itemsEl = <div>Načítání položek..</div>;
+    }
+
+    return (
+        <>
+            <ToastContainer
+                position="bottom-left"
+                autoClose={1000}
+            />
+            <div className='row justify-content-center'>
+                <div className='col-6 my-3'>
+                    <QrReader
+                        onResult={(res) =>{ handleScan(res); }}
+                        scanDelay={500}
+                        ViewFinder={ViewFinder}
+                        constraints={{facingMode: "environment"}}
+                    />
+                </div>
+
+            </div>
+            <div className=''>
+                <h5 className='my-3'>Položky</h5>
+                {itemsEl}
+            </div>
+        </>
+    );
+}
+\end{lstlisting}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/image.png}
+    \caption{Ukázka komponenty pro správu a zobrazení polžoek ve skupině}
+    \label{fig:enter-label}
+\end{figure}
+
+
+
+Druhou částí úkolu bylo správně rozpoznání nově generovaných kódů při výdeji / příjmu. 
+Pokud metoda rozpoznávající odeslaný QR kód nenašla žádný odpovícající produkt, je vyhozena chyba která je následně zobrazena uživateli. Upravil jsem logiku tak, aby v případě že daný kód nenáleží žádnému produktu se aplikace před yhozením chyby jako alternativní možnost pokusila vyhledat jestli se nejedná o kód skupiny. V případě že ano, přenese se zpracování do nově vytvořené metody.
+
+Tato metoda načte všechny produkty ve skupině a následně se formou transakce pokusí do protokolu postupně přidávat jeden po druhém. Přidání jednotlivých produktů už je řešeno stejnou metodou jako kdyby byl tento produkt naskenován přímo. Pokud při zpracování produktu dojde k chybě (produkt byl již vydán, není dostupný, byl vyřazen apod.) je tato chyba předáná uživateli a transakce se vrátí zpět do původního stavu (rollback) jako by nebyl přidán žádný produkt. 
+
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na skupiny produktů]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 8h \\
+			Implementace správy skupin & 16h \\
+            Implementace skupin do příjmu / výdeje & 8h \\
+            Testování, ladění a opravy & 8h \\
+            \midrule
+            Celkem  & 40h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+\section{Oprávnění uživatelů}
+
+S rostoucím počtem funkcí v systému chceme, aby některé funkcionality zůstaly vybraným uživatelům skryty. Může to být jak z bezpečnostních důvodů (ne všichni uživatelé mají oprávnění vydávat zboží ze skladu) tak z důvodu zachování jednoduchosti systému (čím méně nepotřebných možností uživatel v systému uvidí, tím se může celá aplikace jevit snažší na ovládání).
+
+Každý uživatel v systému figuruje v jedné ze třech rolí (administrátor, skladník, uživatel). Nová funkce by ale kromě tohoto základního dělení měla umožnit u každého uživatel určit ke kterým z vybraných funkcí bude mít přístup nezávisle na jeho roli.
+
+Vybrané volitelné funkcionality dostupné pro uživatele:
+\begin{itemize}
+    \item Vytváření akcí
+    \item Akce s okamžitým odběrem
+    \item Výdej ze skladu
+    \item Manuální výdej ze skladu (bez skenování QR)
+    \item Příjem na sklad
+    \item Manuální příjem na sklad (bez skenování QR)
+    \item Audit produktu
+    \item Zobrazení skladovýc zásob
+    \item Zobrazení pořizovacích cen produktů
+    \item Inventura
+    \item Skener produktů
+\end{itemize}
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item Na kartě editace uživatele bude možné formou zatržítek zvolit, ke kterým z vybraných funkcí má mít daný uživatel přístup
+    \item Vybrané funkcionality nově nebudou závislé na zvolené roli
+    \item Změny se projeví ihned při uložení (nebude vyžadováno znovu-přihášení uživatele)
+\end{itemize}
+
+\subsection{Implementace zatržítek}
+
+Zda uživatel má nebo nemá přístup ke konkrétní funkcionalitě bude reprezentováno sloupcem v tabulce uživatelů. Pro každou funkci jeden nezávislý sloupec. Formulář s informacemi o uživateli je opět realizován pomocí knihovny Nette/Forms. Zaškrtávací pole pro jednotlivé funkce jsem přidal do továrny formuláře.
+
+\begin{lstlisting}[language=php, label=src:UserFormFactory.php,caption={Úprava továrny pro formulář uživatelů }]
+// ...
+$form->addCheckbox('can_create_events', 'Může vytvářet akce');
+$form->addCheckbox('can_create_fast_events', 'Může vytvářet akce s okamžitým odběrem');
+$form->addCheckbox('can_scan_out', 'Může vydávat ze skladu');
+// ... (zbytek metody create)
+
+\end{lstlisting}
+
+Pro všechny stávající uživatele je nutné zachovat aktuální platné oprávnění. To jsem provedl pro jednotlivé role pomocí SQL dotazů. 
+
+\begin{lstlisting}[language=SQL,label=src:UserFormFactory.php,caption={Nastavení výchozích oprávnění pro jednotlivé role uživatelů}]
+
+-- Nastavení výchozích oprávnění pro zákazníky
+UPDATE user
+SET can_create_events = 1, can_xxx = 1, ...
+WHERE role = 'customer';
+
+-- Nastavení výchozích oprávnění pro skladníky
+UPDATE user
+SET can_create_events = 1, can_scan_out = 1, ...
+WHERE role = 'warehouse';
+
+-- Nastavení výchozích oprávnění pro administrátory
+UPDATE user
+SET can_create_events = 1, can_create_fast_events = 1, can_scan_out = 1, ...
+WHERE role = 'admin';
+
+\end{lstlisting}
+
+
+\subsection{Oprávnění}
+
+Pro každou funkci bylo nutné v systému najít konkrétní místa, kde je potřeba použití této funkce omezit. Bylo nutné ošetřit vždy zobrazení tlačítek pro použití a zároveň i přímo přístup k funkci (aby uživatel který to nemá povoleno nemohl přístoupit k výdeji položek zadáním správné URL adresy).
+
+Vě většině případů již byl přístup omezen pomocí role, bylo tedy většnou nutné nahradit stávající podmínku na roli za novou podmínku přímo na konkrétní funkci).
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na oprávnění]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 8h \\
+			Implementace zatržítek & 8h \\
+            Implementace oprávnění & 24h \\
+            Testování, ladění a opravy & 8h \\
+            \midrule
+            Celkem  & 48h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+\section{Tiskové sestavy}
+
+Aplikace umpožňuje ke každé objednávce generovat několik různých tiskových sestav. Vygenerovaná tisková sestava ale vždy reflektuje aktuální stav objednávky. Při každé změně objednávky (datumy, položky, ceny) se změna propíše také do samotné tiskové sestavy. Bylo by ale lepší, kdyby se každá sestava v moment vystavení uložila jako nezávislý PDF dokument, který si je možné zpětně zobrazit a porovnávat mezi sebou.
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item Nová karta dokumenty obsahující všechny vygenerované dokumenty pod aktuálně zvolenou objednávkou
+    \item Upravit generování sestav tak, aby byly generované sestavy před zobrazením nejprve uloženy do sekce dokumenty
+    \item U uložených dokumentů evidovat také datum a čas vytvoření a uživatele, který sestavu vygeneroval
+    \item Umožnit odstranění dokumentů
+    \item Vyřešit zabezpečení aby uložené dokumenty byly vždy přístupné pouze uživatelům kteří mají příštup k dané objednávce
+\end{itemize}
+
+\subsection{Implementace}
+
+Prvním krokem byla úprava generování sestav. Po vytvoření PDF dokumentu knihovnou mPDF se soubor nesmí odeslat do prohlížeče ke stažení, ale musí být uložen jako PDF dokument 
+na serveru. Do nové tabulky s dokumenty je následné uložen záznam o vygenerovaném dokumentu. Záznam obsahuje informaci o jakou sestavu se jedná, kdo a kdy jej vygeneroval, k jaké objednávce patří a název PDF souboru na serveru. A nakonec je na výstup do prohlížeče odeslán vygenerovaný dokument.
+
+Na základě záznamů v nově vzniklé tabulce bylo možní připravit novou kartu dokumenty a zobrazit zde všechny dokumenty vytvořené v rámci konkrétní objednávky. Pokaždé, když má systém načíst a zobrazit soubor k nějakému dokumentu, dojde nejdřív ke kontrole aktuálně přihlášeného uživatele, zda má právo k přístupu k objednávce ke které dokument patří. Ke kontrole oprávnění jsem využil již hotovou metodu. Funkce pro odstranění dokumentu odstraní záznam v tabulce a zároveň i příslušný PDF dokument na serveru. 
+
+
+\begin{table}
+	\centering
+	\caption[Časová náročnost úkolu na dokumenty]{Shrnutí časové náročnosti úkolu}
+	\label{tab:TopLevelTableLabel}
+	{
+		\begin{tabular}{lr}
+			\toprule
+			Dílčí část & Čas\\
+			\midrule
+			Analýza a návrh řešení & 8h \\
+			Implementace zatržítek & 12h \\
+            Testování, ladění a opravy & 8h \\
+            \midrule
+            Celkem  & 28h \\
+			\midrule
+		\end{tabular}
+	}
+\end{table}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/karta-dokumenty.png}
+    \caption{Ukázka zobrazení vygenerovaných dokumentů}
+    \label{fig:enter-label}
+\end{figure}
+
+\section{Historie objednávek}
+
+Objednávky a její položky se v systému často mění. K objednávce má částo přístup více uživatelů jak ze strany zákazníka tak ze strany skladu. Aby bylo možné zpětně dohledat kdo kterou změnu provedl, zavedli jsme funkci pro sledování historie. 
+
+\subsection{Analýza problému}
+
+\begin{itemize}
+    \item V administraci bude možné u objednávky zobrazit celou její historii (dostupné budou informace o tom kdo objednávku s jakými údaji založil, kdo a jak případně měnil v průběhu termíny, kdo přidal kterou položku, kdo a jak měnil množství u položek i kdo ji případně stornoval) 
+    \item Zároveň bude možné si zobrazit aktivitu konkrétního uživatele a jaké změny provedl na kterých akcích
+    \item Informace budou dostupné pouze administrátorovi 
+    \item Informae budou zobrazeny chronologicky v tabulce a bude možné si vyfiltrovat pouze určité typy událostí (např. mě zajímají pouze změny termínů) 
+\end{itemize}
+
+\subsection{Databázový model}
+
+Nejprve bylo potřeba vyřešit formu ukládání dat o změnách do databáze. Vznikla nová tabulka, ve které každý řádek reprezentuje jednu konkrétní událost. Struktura tabulky je následující:
+
+\begin{itemize}
+    \item activity\_id - ID aktivity (primární klíč)
+    \item user\_id - ID uživatele
+    \item order\_id - ID objednávky
+    \item product\_id - ID produktu, kterého se změna týká (může být NULL)
+    \item created\_at - datum vytvoření
+    \item type - typ události (viz. níže)
+    \item description - popis události
+\end{itemize}
+
+Sloupec description obsahuje textový popis události včetně bližšího popisu změny (např. změna počtu kusů u produkty XYZ z 3 ks na 6 ks). Sloupec type může nabývat jedné z následujících hodnot a tato hodnota je pak potřebná pro filtrování událostí.
+
+\begin{itemize}
+    \item order\_created - objednávka byla vytvořena
+    \item order\_edited - údaje o objednávce byly změněny
+    \item order\_date\_changed - termín objednávky byl změněn
+    \item product\_quantity\_changed - změna počtu kusů u položky
+\end{itemize}
+
+Do takto předpřipravené tabulky bude možné jednoduše veškeré změny zaznamenávat.
+
+\subsection{Implementace}
+
+Provádění změn v objednávce je možné z několika různých míst. Například přidání jednoho kusu produktu můžeme provést buďto přímo v košíku, na detailu produktu tlačítkem pro přidání produktu do košíku nebo při výdeji naskenováním příslušného kódu. Pro jednotné vytváření událostí ze všech potřebných míst jsem vytvořil jednoduchou třídu podle návrhového vzoru fasáda, která zabalí logiku vytvoření události a poskytne jednoduché a omezené rozhraní. \cite{refactoringFacadeDesign}
+
+Metody pro vytvoření jednotlivých událostí jsem napojil na všechny potřebná místa v aplikaci tak, aby každá změna byla správně propsána do historie.
+
+Další částí, kterou bylo potřeba vytvořit, bylo zobrazení přehledu událostí v rámci zadané akce. K tomuto jsem opět využil knihovnu ublaboo/datagrid. \cite{contributteContributteDatagrid} Kromě samotného vytvoření tabulky s daty knihovna poskytla také rozhraní pro možnost filtrace a řazení událostí. Úplně stejným způsobem jsem potom řešil zobrazení aktivity pod jednotlivými uživateli. 

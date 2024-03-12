@@ -1,0 +1,44 @@
+\chapter{Použité technologie}
+Tato kapitola se zaměřuje na popis technologií, které využívá buďto samotný informační systém, nebo tvoří nedílnou součást vývoje a verzování. Systém funguje jako webová aplikace a je tedy aktuálně dostupná pouze přes webový prohlížeč.
+
+\section{Nette framework}
+
+Nette je český framework usnadňující tvorbu aplikací v PHP. Je klasickým příkladem použití architektury MVP (Model - View - Presenter). \cite{nette-itnetwork} Framework se skládá z několika balíků a každý z nich řeší okruh problémů v určité oblasti. Programátor si může zvolit, které balíky bude využívat a které naopak ne. 
+Seznam použitých balíků z Nette:
+\begin{itemize}
+  \item Nette DI Container - návrhový vzor Dependency Injection
+  \item Nette Database - vrstva zajišťující komunikaci s databází
+  \item Nette Forms - generování uživatelských formulářů
+  \item Nette Mail - obaluje funkcionalitu týkající se odesílání e-mailů
+  \item a další..
+\end{itemize}
+
+\section{MySql databáze}
+
+K trvalému ukládání dat je využita relační MySql databáze. Výhodou zde je standard SQL, který by v případě potřeby umožnil relativně nenáročnou migraci na jinou SQL databázi.
+
+
+Vyvíjená aplikace má poměrně pevně daný databázový model, který se v čase příliš nemění a je tedy vhodný pro použití relační databáze. Dalším důvodem byl i fakt, že MySql je open-source a také nabídka českých hostingů, které standardně nabízí hostingové řešení právě v kombinaci PHP a MySql.
+
+\section{React}
+
+React je javascriptová knihovna pro tvorbu dynamických uživatelských rozhraní vyvíjená společností Meta. \cite{react} Funguje na principu logických komponent (např. tlačítka, vyskakovací okna) které do sebe lze zanořovat a tvořit tak celou strukturu aplikace. Hlavním benefitem tohoto přístupu je znovupoužitelnost vytvořených komponent.
+
+React nebyl součástí používaných technologií od úplného začátku vývoje. Při zavedení Reactu nebylo nutné hned veškeré dosud funkční rozhraní přepisovat do komponent, ale bylo možné nově vzniklé komponenty snadno implementovat do existujících částí aplikace.
+
+\section{Git a GitHub}
+
+Ke správě verzí je využíván verzovací nástroj Git. Jeho použití při vývoji přináší spoustu výhod jako možnost efektivní spolupráce více programátorů, možnost rozdělení projektu do větví apod.
+
+\subsection{Github Actions}
+
+Aby nebylo nutné kód při každé aktualizaci ručně nahrávat na produkční server a zároveň bylo zajištěno že budou při každém nahrání provedený všechny operace korektě, je na Githubu nastaven skript, který se spustí při každém nahrání do repozitáře (push). Tento skript dočasně znepřístupní celý systém, nahraje automaticky veškeré změněné soubory na webový server a zajistí vymazání dočasných souborů a nakonec systém opět zpřístupní.
+
+
+\section{mPDF}
+
+mPDF je knihovna umožňující generování PDF dokumentů na základě vstupního HTML a CSS kódu. Možnosti HTML a CSS jsou dost omezené a z daleka nelze použít to, co se běžně používá na webu. V systému se používá pro generování různých tiskových sestav.
+
+
+
+
