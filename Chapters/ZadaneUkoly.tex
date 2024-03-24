@@ -11,7 +11,7 @@ Po konzultaci jsme se dohodli na následujicím řešení:
 
 
 \begin{itemize}
-    \item V administrační části aplikace přibyde nová záložka "Množstevní jednotky". Bude umožněno vytvářeni nových, jejich editace a odstraňování.
+    \item V administrační části aplikace přibyde nová záložka "Množstevní jednotky". Bude umožněno vytváření nových, jejich editace a odstraňování.
     \item Na kartě editace produktu bude ve formuláři pole "Množstevní jednotka", jako výchozí bude nastavena první jednotka v pořadí.
     \item Nastavenou jednotku je nutné zobrazit na všech částech webu (výpis produktů, detail produktů, košík) a také ve všech tiskových sestavách (exporty košíku apod.). 
     \item Při vložení do košíku se musí jednotka propsat také do samotné položky objednávky, jednak aby se při případně budoucí změně jednotky změna nepropsala do již realizovaných objednávek a zároveň kvůli optimalizaci SQL dotazů (aby nebylo nutné provádět JOIN kvůli získání jednotky).
@@ -77,11 +77,11 @@ Formát QR kódu se generuje následovně z několika částí, každá část j
 \begin{itemize}
     \item První 3 znaky tvoří prefix \enquote{ET;}
     \item Další znaky tvoří kód samotného produktu (např.  \enquote{1;}) 
-    \item Další 4 znaky tvoří kód fyzického kusu (např. \enquote{001;}
-    \item Poslední 4 znaky tvoří náhodně vygenerované písmena a čísla (např. \enquote{A2B8;}
+    \item Další 4 znaky tvoří kód fyzického kusu (např. \enquote{001;})
+    \item Poslední 4 znaky tvoří náhodně vygenerované písmena a čísla (např. \enquote{A2B8;})
 \end{itemize}
 
-Celkový obsah QR kódu pak může vypadat následovně: \enquote{ET;1;001;A2B8}
+Celkový obsah QR kódu pak může vypadat následovně: \enquote{ET;1;001;A2B8}.
 
 
 \begin{table}
@@ -112,7 +112,7 @@ První zvažovanou možností komunikace byla možnost přímé komunikace aplik
 Druhou, mnohem jednodušší, možností bylo využít výrobcem dodáváný software P-Touch editor. Ten umožňuje grafickou tvorbu štítků a jejich tisk. V grafickém návrhu štítků je možné vytvořit i proměnné pole, jehož hodnotu lze potom při tisku načítat z datového souboru.
 Jediné, co tedy bylo potřeba pro tuto variantu vytvořit, byl export produktových kódů do souboru v excelu, který na každém řádku kromě samotného QR kódu obsahoval i další informace k zobrazení na štítku (název, umístění ve skladu, číselný kód).
 
-Z důvodu výrazně nižší časové náročnosti se vedení rozhodlo pro realizování druhé varianty. Tisk přes dodaný software je sice o něco méně komfortní, na druhou stranu již v základu nábízí daleko více možností a jakmile bude celý sklad polepený štítky, bude se tato funkce využívat spíše zřídka. 
+Z důvodu výrazně nižší časové náročnosti se vedení rozhodlo pro realizaci druhé varianty. Tisk přes dodaný software je sice o něco méně komfortní, na druhou stranu již v základu nábízí daleko více možností a jakmile bude celý sklad polepený štítky, bude se tato funkce využívat spíše zřídka. 
 
 \section{Inventura}
 
@@ -207,11 +207,11 @@ Navazujícím úkolem bylo vytvoření funkcionality, která umožní provést i
 \subsection{Analýza problému}
 
 \begin{itemize}
-    \item Vytvoření tabulek stock\_taking a stock\_taking\_item
-    \item Vytvoření API které bude využívat uživatelské rozhraní
-    \item Vytvoření jednoduchého rozhraní pro zobrazení všech produktů s možností začít inventuru a zobrazení poslední provedené inventury
-    \item Vytvoření rozhraní pro provedení inventury se skenerem a seznam naskenovaných položek
-    \item Po dokončení umožnit zadat podpis pracovníka, který inventuru provedl (prstem na displeji telefonu / tabletu)
+    \item Vytvoření tabulek stock\_taking a stock\_taking\_item.
+    \item Vytvoření API které bude využívat uživatelské rozhraní.
+    \item Vytvoření jednoduchého rozhraní pro zobrazení všech produktů s možností začít inventuru a zobrazení poslední provedené inventury.
+    \item Vytvoření rozhraní pro provedení inventury se skenerem a seznam naskenovaných položek.
+    \item Po dokončení umožnit zadat podpis pracovníka, který inventuru provedl (prstem na displeji telefonu / tabletu).
 \end{itemize}
 
 \subsection{Skenování kódů}
@@ -249,7 +249,7 @@ Při testování s čtečkou jsem narazil na několik problémů týkajících s
 
 \begin{table}
 	\centering
-	\caption[Časová náročnost úkolu na inventuru]{Shrnutí časové náročnosti úkolu}
+	\caption[Časová náročnost úkolu na interaktivní inventuru]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
 	{
 		\begin{tabular}{lr}
@@ -272,7 +272,7 @@ Při testování s čtečkou jsem narazil na několik problémů týkajících s
 
 V systému se nachází objednávky v rámci kterých si zákazník může plánovat zapůjčení zboží na budoucí akci. Přidáváním položek do objednávky dochází automaticky také k blokaci produktu na daný termín na skladě.
 
-Pokud by zákazník ale chtěl pouze zjistit celkovou cenu za zapůjčení konkrétních položek na nějaký termín, nemá v současné době jinou možnost než vytvořit objednávku která již bude na daný temrín zboží blokovat.
+Pokud by zákazník ale chtěl pouze zjistit celkovou cenu za zapůjčení konkrétních položek na nějaký termín, nemá v současné době jinou možnost než vytvořit objednávku která již bude na daný termín zboží blokovat.
 
 Tento problém by měly řešit kalkulace, které se budou chovat v podstatě úplně stejně jako objednávky jen s tím rozdílem, že nebudou mít nutně přesně daný termín a nebudou blokovat položky na skladě.
 
@@ -295,7 +295,7 @@ V uživatelské části jsem vytvořil novou kartu s výpisem a možností sprá
 
 Pro možnost vytvoření a editace nabídek jsem vytvořil jednoduchý formulář - opět pomocí knihovny Nette Forms. Funkcionalitu vyhledávání mezi nabídkami jsem převzal z karty objednávek.
 
-Dalši změny v uživatelském rozhzraní nebylo nutné provádět. Uživatel může vytvořit kalkulaci, vybírat z nabídky produktů a vkládat produkty do této kalkulace stejně jako v případě objednávek.
+Další změny v uživatelském rozhzraní nebylo nutné provádět. Uživatel může vytvořit kalkulaci, vybírat z nabídky produktů a vkládat produkty do této kalkulace stejně jako v případě objednávek.
 
 \begin{figure}
     \centering
@@ -313,13 +313,13 @@ Aby produkty v kalkulacích nebyly rezervovány, bylo nutné upravit část kód
     \item Záznam v tabulce položek objednávky opatří příznakem isCalculation = 1
 \end{itemize}
 
-Část kódu která se stará o kontrolu dostupnosti ignoruje položky s nastaveným příznakem isCalculation (stejně jako ignoruje třeba položky u zrušených akcí). Příznak by síce díky vazbě na tabulku objednávek nebyl potřeba, ale vzhledem k tomu že vyhledání dostupnosti položek se někdy může stát časově nejnáročnější operací jsem se rozhodl mít tuto hodnotu v databází redundantně z důvodu lepšího výkonu.
+Část kódu která se stará o kontrolu dostupnosti ignoruje položky s nastaveným příznakem isCalculation (stejně jako ignoruje třeba položky u zrušených akcí). Příznak by sice díky vazbě na tabulku objednávek nebyl potřeba, ale vzhledem k tomu že vyhledání dostupnosti položek se někdy může stát časově nejnáročnější operací jsem se rozhodl mít tuto hodnotu v databází redundantně z důvodu lepšího výkonu.
 
 \subsection{Kopírování kalkulací a převod na akci}
 
 Možnost kopírování byla jednodušší funkcionalita, které pouze zkopíruje záznam samotné kalkulace a následně všechny její položky. Opět nedochází ke kontrole dostupnosti a výsledkem je naprosto totožná kalkulace jako ta původní.
 
-Převod kalkulace na akci je užitečná funkce v případě, že se zákazník rozhodne pro objednávku zadané kalkulace na nějaký konkrétní termín. Před převodem potřebujeme zkontrolovat skladovou dostupnost všech položek v kalkulaci, poté vytvořit novou objednávku do které převedeme všechny dostupné položky a informovat uživatele  o položkách které dostupné nejsou. Pokud jě nějaká položka dostupná pouze v částečném množštví, vložíme do objednávky aspoň toto omezené množší a opět informujeme uživatele.
+Převod kalkulace na akci je užitečná funkce v případě, že se zákazník rozhodne pro objednávku zadané kalkulace na nějaký konkrétní termín. Před převodem potřebujeme zkontrolovat skladovou dostupnost všech položek v kalkulaci, poté vytvořit novou objednávku do které převedeme všechny dostupné položky a informovat uživatele  o položkách které dostupné nejsou. Pokud je nějaká položka dostupná pouze v částečném množštví, vložíme do objednávky alespoň toto omezené množství a opět informujeme uživatele.
 
 
 \begin{table}
@@ -352,7 +352,7 @@ Při rezervaci položek se stává, že spolu některé položky souvisejí a je
     \item V administrátorském rozhraní umožnit k produktu nastavit vazbu na další produkty s možností volby počtu kusů.
     \item Při přidání produktu do objednávky se bude kontrolovat jak dostupnost hlavního produktu tak i všech provázaných produktů.
     \item Při přidání produktu do objednávky se společně s hlavním produktem vloží v zadaném množštví i všechy vázané produkty.
-    \item Tyto vázané produkty se v objednávce nebudeou zobrazovat.
+    \item Tyto vázané produkty se v objednávce nebudou zobrazovat.
     \item Při změně množství případně odebrání hlavního produktu se ve správném poměru musí změnit nebo odebrat i vázané produkty.
 
 \end{itemize}
@@ -594,7 +594,7 @@ export const ProductGroupScanner = (props) => {
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{Figures/image.png}
-    \caption{Ukázka komponenty pro správu a zobrazení polžoek ve skupině}
+    \caption{Ukázka komponenty pro správu a zobrazení položek ve skupině}
     \label{fig:enter-label}
 \end{figure}
 
@@ -652,7 +652,7 @@ Vybrané volitelné funkcionality dostupné pro uživatele:
 \begin{itemize}
     \item Na kartě editace uživatele bude možné formou zatržítek zvolit, ke kterým z vybraných funkcí má mít daný uživatel přístup.
     \item Vybrané funkcionality nově nebudou závislé na zvolené roli.
-    \item Změny se projeví ihned při uložení (nebude vyžadováno znovu-přihášení uživatele).
+    \item Změny se projeví ihned při uložení (nebude vyžadováno znovu-přihlášení uživatele).
 \end{itemize}
 
 \subsection{Implementace zatržítek}
