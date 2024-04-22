@@ -2,7 +2,7 @@
 
 \section{Zavedení množstevních jednotek}
 
-Systém neumožňoval definování množsevní jednotky u produktů. Všechny položky se vždy zobrazovaly s množstevní jednotkou ks - kus. Ne vždy je ale toto dostačující. V některých případech je potřeba dát zákazníkovi najevo že se produkt půjčuje po celých baleních, nebo lze zakoupit na metry.
+Systém neumožňoval definování množstevní jednotky u produktů. Všechny položky se vždy zobrazovaly s množstevní jednotkou kus (ks). Ne vždy je ale toto dostačující. V některých případech je potřeba dát zákazníkovi najevo že se produkt půjčuje po celých baleních, nebo lze zakoupit na metry.
 
 \subsection{Analýza problému}
 
@@ -11,22 +11,21 @@ Po konzultaci jsme se dohodli na následujicím řešení:
 
 
 \begin{itemize}
-    \item V administrační části aplikace přibyde nová záložka "Množstevní jednotky". Bude umožněno vytváření nových, jejich editace a odstraňování.
-    \item Na kartě editace produktu bude ve formuláři pole "Množstevní jednotka", jako výchozí bude nastavena první jednotka v pořadí.
+    \item V administrační části aplikace přibude nová záložka \enquote{Množstevní jednotky}. Bude umožněno vytváření nových, jejich editace a odstraňování.
+    \item Na kartě editace produktu bude ve formuláři pole \enquote{Množstevní jednotka}, jako výchozí bude nastavena první jednotka v pořadí.
     \item Nastavenou jednotku je nutné zobrazit na všech částech webu (výpis produktů, detail produktů, košík) a také ve všech tiskových sestavách (exporty košíku apod.). 
     \item Při vložení do košíku se musí jednotka propsat také do samotné položky objednávky, jednak aby se při případně budoucí změně jednotky změna nepropsala do již realizovaných objednávek a zároveň kvůli optimalizaci SQL dotazů (aby nebylo nutné provádět JOIN kvůli získání jednotky).
-    \item Pro urychlení vyplnění jednotek všech produktů bylo nutné připravit jednoduchý export produktů do excelu a následný import s upravenými jednotkami. Pokud daná jednotka při importu neexistuje, dojde nejprve k jejímu vytvoření.
+    \item Pro urychlení vyplnění jednotek všech produktů bylo nutné připravit jednoduchý export produktů do sešitu aplikace MS Excel a následný import s upravenými jednotkami. Pokud daná jednotka při importu neexistuje, dojde nejprve k jejímu vytvoření.
 \end{itemize}
 
 \subsection{Shrnutí úkolu}
 
-Jednalo se o jednodušší úkol zaměřený spíše na seznámení se systémem a jeho zdrojovým kódem. Při realizaci jsem nanarazil na žádný větší problém. Číselník jednotek představuje pouze seznam jednotek k výběru, aby byly jednotky všude zadány konzistentním způsobem. Kvůli zachování jednoduchosti produkty ale neobsahují cizí klíč na jednotku.
+Jednalo se o jednodušší úkol zaměřený spíše na seznámení se systémem a jeho zdrojovým kódem. Při realizaci jsem nenarazil na žádný větší problém. Číselník jednotek představuje pouze seznam jednotek k výběru, aby byly jednotky všude zadány konzistentním způsobem. Kvůli zachování jednoduchosti produkty ale neobsahují cizí klíč na jednotku.
 
 \begin{table}
 	\centering
 	\caption[Časová náročnost úkolu na zavedení množstevních jednotek]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -39,7 +38,6 @@ Jednalo se o jednodušší úkol zaměřený spíše na seznámení se systémem
             Celkem  & 20h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 \begin{figure}
@@ -88,7 +86,6 @@ Celkový obsah QR kódu pak může vypadat následovně: \enquote{ET;1;001;A2B8}
 	\centering
 	\caption[Časová náročnost úkolu na evidenci fyzických kusů na skladě]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -100,7 +97,6 @@ Celkový obsah QR kódu pak může vypadat následovně: \enquote{ET;1;001;A2B8}
             Celkem  & 66h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 \subsection{Tisk štítků a komunikace s tiskárnou}
@@ -109,10 +105,10 @@ Jakmile bylo vyřešeno textové generování kódů, bylo potřeba navrhnout, j
 
 První zvažovanou možností komunikace byla možnost přímé komunikace aplikace s tiskárnou na nižší úrovni pomocí Brother Print SDK. \cite{brotherInformationLabel} Toto řešení by bylo určitě funkční, ale náročnost implementace velmi vysoká. Bylo by potřeba vytvořit úplně novou pomocnou aplikaci do telefonu, která by musela komunikovat s informačním systém i tiskárnou. Mobilní aplikace by sloužila především k vyhledání a výběru produktu k tisku a následně by přenesla informaci k tisku do tiskárny.
 
-Druhou, mnohem jednodušší, možností bylo využít výrobcem dodáváný software P-Touch editor. Ten umožňuje grafickou tvorbu štítků a jejich tisk. V grafickém návrhu štítků je možné vytvořit i proměnné pole, jehož hodnotu lze potom při tisku načítat z datového souboru.
-Jediné, co tedy bylo potřeba pro tuto variantu vytvořit, byl export produktových kódů do souboru v excelu, který na každém řádku kromě samotného QR kódu obsahoval i další informace k zobrazení na štítku (název, umístění ve skladu, číselný kód).
+Druhou, mnohem jednodušší, možností bylo využít výrobcem dodávaný software P-Touch editor. Ten umožňuje grafickou tvorbu štítků a jejich tisk. V grafickém návrhu štítků je možné vytvořit i proměnné pole, jehož hodnotu lze potom při tisku načítat z datového souboru.
+Jediné, co tedy bylo potřeba pro tuto variantu vytvořit, byl export produktových kódů do souboru v Excelu, který na každém řádku kromě samotného QR kódu obsahoval i další informace k zobrazení na štítku (název, umístění ve skladu, číselný kód).
 
-Z důvodu výrazně nižší časové náročnosti se vedení rozhodlo pro realizaci druhé varianty. Tisk přes dodaný software je sice o něco méně komfortní, na druhou stranu již v základu nábízí daleko více možností a jakmile bude celý sklad polepený štítky, bude se tato funkce využívat spíše zřídka. 
+Z důvodu výrazně nižší časové náročnosti se vedení rozhodlo pro realizaci druhé varianty. Tisk přes dodaný software je sice o něco méně komfortní, na druhou stranu již v základu nabízí daleko více možností a jakmile bude celý sklad polepený štítky, bude se tato funkce využívat spíše zřídka. 
 
 \section{Inventura}
 
@@ -134,7 +130,6 @@ Cílem tohoto úkolu bylo vytvořit nástroj usnadňující provadění pravidel
 	\centering
 	\caption[Časová náročnost úkolu na inventuru]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -144,23 +139,21 @@ Cílem tohoto úkolu bylo vytvořit nástroj usnadňující provadění pravidel
             Celkem  & 16h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{Figures/inventura-pdf.png}
     \caption{Formulář pro generování dokumentu inventury}
-    \label{fig:enter-label}
+    \label{fig:FormularInventura}
 \end{figure}
 
 \subsection{Formulář pro vytvoření dokumentu}
 
-Uživatel si dokument inventury může vygenerovat pomocí jednoduchého formuláře. Formulář byl implementován pomocí knihovny Nette Forms a formou návrhového vzoru továrna, který pro případ potřeby zajišťuje možnost znovupoužití formuláře v jiných částech aplikace. \cite{refactoringFactoryMethod}
+Uživatel si dokument inventury může vygenerovat pomocí jednoduchého formuláře, viz obrázek \ref{fig:FormularInventura}. Formulář byl implementován, viz výpis \ref{src:GenerateStockTakingDocumentFormFactory}, pomocí knihovny Nette Forms a formou návrhového vzoru továrna, který pro případ potřeby zajišťuje možnost znovupoužití formuláře v jiných částech aplikace \cite{refactoringFactoryMethod}.
 Vykreslení jednotlivých prvků do šablony pak již probíhá automaticky. Metoda zároveň využívá i další továrnu pro vytvoření základu formuláře, tento vytvořený formulář již obsahuje základní nastavení týkající se vykreslení. 
 
-\begin{lstlisting}[label=src:GenerateStockTakingDocumentFormFactory,caption={Továrna formuláře pro generování dokumentu s inventurou}]
-
+\begin{lstlisting}[caption={Továrna formuláře pro generování dokumentu s inventurou}, label={src:GenerateStockTakingDocumentFormFactory}]
 final class GenerateStockTakingDocumentFormFactory
 {
     // ... Konstruktor a předání DI závislostí
@@ -197,7 +190,6 @@ final class GenerateStockTakingDocumentFormFactory
 		return $form;
 	}
 }
-
 \end{lstlisting}
 
 \section{Interaktivní inventura}
@@ -207,8 +199,8 @@ Navazujícím úkolem bylo vytvoření funkcionality, která umožní provést i
 \subsection{Analýza problému}
 
 \begin{itemize}
-    \item Vytvoření tabulek stock\_taking a stock\_taking\_item.
-    \item Vytvoření API které bude využívat uživatelské rozhraní.
+    \item Vytvoření tabulek \lstinline{stock_taking} a \lstinline{stock_taking_item}.
+    \item Vytvoření API, které bude využívat uživatelské rozhraní.
     \item Vytvoření jednoduchého rozhraní pro zobrazení všech produktů s možností začít inventuru a zobrazení poslední provedené inventury.
     \item Vytvoření rozhraní pro provedení inventury se skenerem a seznam naskenovaných položek.
     \item Po dokončení umožnit zadat podpis pracovníka, který inventuru provedl (prstem na displeji telefonu / tabletu).
@@ -216,13 +208,13 @@ Navazujícím úkolem bylo vytvoření funkcionality, která umožní provést i
 
 \subsection{Skenování kódů}
 
-Načtení položky do inventury je možné na základě jejího unikátního QR kódu. Tento kód je možné načíst přímo pomocí fotoaparátu telefonu. Pro tuto část jsem použil již hotové řešení - React komponentu react-qr-scanner. 
+Načtení položky do inventury je možné na základě jejího unikátního QR kódu. Tento kód je možné načíst přímo pomocí fotoaparátu telefonu. Pro tuto část jsem použil již hotové řešení -- React komponentu \lstinline{react-qr-scanner}. 
 
 Po seznámení se základními funkcemi byla práce s touto komponentou jednoduchá a intuitivní. Při úspěšném naskenování kódu je tato informace odeslána na REST API, které ji zpracuje, rozpozná kód produktu a zařadí položku do inventury. 
 
 \subsection{Podpisové pole}
 
-Po naskenování všech položek je možné inventuru uzamknout a vytvořit prstem podpis, který se následně propíše do vygenerovaného PDF dokumentu. Pro podpisové pole jsem opět hledal vhodné již naimplementované řešení. Z dostupných variant se nakonec jako nejvhodnější jevila komponenta react-signature-canvas. 
+Po naskenování všech položek je možné inventuru uzamknout a vytvořit prstem podpis, který se následně propíše do vygenerovaného PDF dokumentu. Pro podpisové pole jsem opět hledal vhodné již implementované řešení. Z dostupných variant se nakonec jako nejvhodnější jevila komponenta \lstinline{react-signature-canvas}. 
 
 \begin{figure}
     \centering
@@ -236,7 +228,7 @@ Po naskenování všech položek je možné inventuru uzamknout a vytvořit prst
 
 Při ostrém testování se zjistilo, že skenování QR kódu telefonem je v praxi relativně pomalé a bylo potřeba vymyslet vhodnější řešení. Domluvili jsme se na možnosti skenování pomocí externí bezdrátové čtečky kódů.
 
-Z uživatelského pohledu nebylo nutné pro implementaci čtečky nic měnit. Čtečka odesílá naskenovaný text jako standardní vstup z klávesnice a jednotlivé kódy odděluje znakem Enter. Stačilo tedy upravit uživatelskou část tak aby poslouchala uživatelský vstup z klávesnice a odesílala jej stejným způsobem jako při naskenování z fotoaparátu.
+Z uživatelského pohledu nebylo nutné pro implementaci čtečky nic měnit. Čtečka odesílá naskenovaný text jako standardní vstup z klávesnice a jednotlivé kódy odděluje znakem Enter. Stačilo tedy upravit uživatelskou část tak, aby poslouchala uživatelský vstup z klávesnice a odesílala jej stejným způsobem jako při naskenování z fotoaparátu.
 
 Při testování s čtečkou jsem narazil na několik problémů týkajících se kódování a odesílání některých neviditelných znaků. Po hlubším nastudování manuálu a několika potřebných změnách nastavení čtečky se ale vše podařilo vyřešit.
 
@@ -251,7 +243,6 @@ Při testování s čtečkou jsem narazil na několik problémů týkajících s
 	\centering
 	\caption[Časová náročnost úkolu na interaktivní inventuru]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -264,7 +255,6 @@ Při testování s čtečkou jsem narazil na několik problémů týkajících s
             Celkem  & 48h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 
@@ -286,16 +276,16 @@ Tento problém by měly řešit kalkulace, které se budou chovat v podstatě ú
 
 \subsection{Databázový model}
 
-Z důvodu že kalkulace mají téměr stejnou funkcionalitu jako objednávky jsem se rozhodl využít stávající tabulku pro objednávky kterou jsem pouze obohatil o příznak signalizující že jde o kalkulaci - isCalculation. 
-Dalším požadavkém bylo, že ke kalkulacím budou mít přístup pouze uživatelé pro které bude tato funkce povolena v administračním rozhraní, pro toto bylo potřeba přidat nový příznak k tabulce s uživateli - canCreateCalculations. Zbytek databázové struktury zůstává nezměněn. 
+Z důvodu že kalkulace mají téměř stejnou funkcionalitu jako objednávky jsem se rozhodl využít stávající tabulku pro objednávky kterou jsem pouze obohatil o příznak signalizující že jde o kalkulaci -- \lstinline{isCalculation}. 
+Dalším požadavkem bylo, že ke kalkulacím budou mít přístup pouze uživatelé pro které bude tato funkce povolena v administračním rozhraní. Pro toto bylo potřeba přidat nový příznak k tabulce s uživateli -- \lstinline{canCreateCalculations}. Zbytek databázové struktury zůstává nezměněn. 
 
 \subsection{Uživatelská část}
 
-V uživatelské části jsem vytvořil novou kartu s výpisem a možností správy nabídek. Podle zmíněného příznaky isCalculation jsem rozdělil zobrazení kalkulací a objednávek v příslušných seznamech. Toto bylo nutné provést na několika místech napříč aplikací.
+V uživatelské části jsem vytvořil novou kartu s výpisem a možností správy nabídek. Podle zmíněného příznaky \lstinline{isCalculation} jsem rozdělil zobrazení kalkulací a objednávek v příslušných seznamech. Toto bylo nutné provést na několika místech napříč aplikací.
 
-Pro možnost vytvoření a editace nabídek jsem vytvořil jednoduchý formulář - opět pomocí knihovny Nette Forms. Funkcionalitu vyhledávání mezi nabídkami jsem převzal z karty objednávek.
+Pro možnost vytvoření a editace nabídek jsem vytvořil jednoduchý formulář -- opět pomocí knihovny Nette Forms. Funkcionalitu vyhledávání mezi nabídkami jsem převzal z karty objednávek.
 
-Další změny v uživatelském rozhzraní nebylo nutné provádět. Uživatel může vytvořit kalkulaci, vybírat z nabídky produktů a vkládat produkty do této kalkulace stejně jako v případě objednávek.
+Další změny v uživatelském rozhraní nebylo nutné provádět. Uživatel může vytvořit kalkulaci, vybírat z nabídky produktů a vkládat produkty do této kalkulace stejně jako v případě objednávek.
 
 \begin{figure}
     \centering
@@ -310,23 +300,22 @@ Aby produkty v kalkulacích nebyly rezervovány, bylo nutné upravit část kód
 
 \begin{itemize}
     \item Přeskočí kontrolu dostupnosti na daný termín
-    \item Záznam v tabulce položek objednávky opatří příznakem isCalculation = 1
+    \item Záznam v tabulce položek objednávky opatří příznakem \lstinline{isCalculation = 1}
 \end{itemize}
 
-Část kódu která se stará o kontrolu dostupnosti ignoruje položky s nastaveným příznakem isCalculation (stejně jako ignoruje třeba položky u zrušených akcí). Příznak by sice díky vazbě na tabulku objednávek nebyl potřeba, ale vzhledem k tomu že vyhledání dostupnosti položek se někdy může stát časově nejnáročnější operací jsem se rozhodl mít tuto hodnotu v databází redundantně z důvodu lepšího výkonu.
+Část kódu která se stará o kontrolu dostupnosti ignoruje položky s nastaveným příznakem \lstinline{isCalculation} (stejně jako ignoruje třeba položky u zrušených akcí). Příznak by sice díky vazbě na tabulku objednávek nebyl potřeba, ale vzhledem k tomu že vyhledání dostupnosti položek se někdy může stát časově nejnáročnější operací jsem se rozhodl mít tuto hodnotu v databází redundantně z důvodu lepšího výkonu.
 
 \subsection{Kopírování kalkulací a převod na akci}
 
 Možnost kopírování byla jednodušší funkcionalita, které pouze zkopíruje záznam samotné kalkulace a následně všechny její položky. Opět nedochází ke kontrole dostupnosti a výsledkem je naprosto totožná kalkulace jako ta původní.
 
-Převod kalkulace na akci je užitečná funkce v případě, že se zákazník rozhodne pro objednávku zadané kalkulace na nějaký konkrétní termín. Před převodem potřebujeme zkontrolovat skladovou dostupnost všech položek v kalkulaci, poté vytvořit novou objednávku do které převedeme všechny dostupné položky a informovat uživatele  o položkách které dostupné nejsou. Pokud je nějaká položka dostupná pouze v částečném množštví, vložíme do objednávky alespoň toto omezené množství a opět informujeme uživatele.
+Převod kalkulace na akci je užitečná funkce v případě, že se zákazník rozhodne pro objednávku zadané kalkulace na nějaký konkrétní termín. Před převodem potřebujeme zkontrolovat skladovou dostupnost všech položek v kalkulaci, poté vytvořit novou objednávku do které převedeme všechny dostupné položky a informovat uživatele  o položkách které dostupné nejsou. Pokud je nějaká položka dostupná pouze v částečném množství, vložíme do objednávky alespoň toto omezené množství a opět informujeme uživatele.
 
 
 \begin{table}
 	\centering
 	\caption[Časová náročnost úkolu na kalkulace]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -339,19 +328,18 @@ Převod kalkulace na akci je užitečná funkce v případě, že se zákazník 
             Celkem  & 44h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 \section{Vázané produkty}
 
-Při rezervaci položek se stává, že spolu některé položky souvisejí a je žádoucí aby objednávka jednoho produktu ze skladu rezervovala i další položky v určitém možství. Cílem této funkcionality je umožnit ve správě produktů tyto pravidla nastavit a ve všech částech aplikace pak rezervovat produkty na základě těchto nastavených pravidel.
+Při rezervaci položek se stává, že spolu některé položky souvisejí a je žádoucí aby objednávka jednoho produktu ze skladu rezervovala i další položky v určitém množství. Cílem této funkcionality je umožnit ve správě produktů tyto pravidla nastavit a ve všech částech aplikace pak rezervovat produkty na základě těchto nastavených pravidel.
 
 \subsection{Analýza problému}
 
 \begin{itemize}
     \item V administrátorském rozhraní umožnit k produktu nastavit vazbu na další produkty s možností volby počtu kusů.
     \item Při přidání produktu do objednávky se bude kontrolovat jak dostupnost hlavního produktu tak i všech provázaných produktů.
-    \item Při přidání produktu do objednávky se společně s hlavním produktem vloží v zadaném množštví i všechy vázané produkty.
+    \item Při přidání produktu do objednávky se společně s hlavním produktem vloží v zadaném množství i všechny vázané produkty.
     \item Tyto vázané produkty se v objednávce nebudou zobrazovat.
     \item Při změně množství případně odebrání hlavního produktu se ve správném poměru musí změnit nebo odebrat i vázané produkty.
 
@@ -454,7 +442,7 @@ final class ItemExpandsToGridFactory
 \subsection{Kontrola dostupnosti a rezervace}
 
 Při ověřování dostupnosti určitého produktu je potřeba aby se produkt rozpadl na pole obsahující všechny produkty u kterých je nutné dostupnost ověřit. Dostupnost je vždy kontrolována pouze do první úrovně (tzn. řešíme pouze produkty které jsou vazbou přímo přiřazeny k hlavnímu produktu). Byl to požadavek ze zadání a navíc nemusíme řešit cyklickou závislost kdy by produkt A požadoval produkt B a ten by zároveň vyžadoval další produkt A.
-Pro účely rozpadu položky jsem vytvořil jednoduchou třídu s jedinou metodou která tuto logiku řeší. Metoda je vždy volána při každé kontrole dostupnosti přímo z třídy která má dostupnost na starosti. Tímto postupem jsem se vyhnul nutnosti měnit logiku ve více částech aplikace.
+Pro účely rozpadu položky jsem vytvořil jednoduchou třídu s jedinou metodou, která tuto logiku řeší. Metoda je vždy volána při každé kontrole dostupnosti přímo z třídy která má dostupnost na starosti. Tímto postupem jsem se vyhnul nutnosti měnit logiku ve více částech aplikace.
 Obdobný postup následoval při přidání položky do objednávky, kdy opět získáme pole všech položek na které se má hlavní položka rozpadnout a následně ukládáme všechny položky. K položkám navíc ukládáme ID hlavní položky, kvůli kterým byly do objednávky přidány.
 Tato informace nám umožní tyto podpoložky v objednávce skrýt a navíc ji pak využívám při další manipulaci s hlavní položkou (změna termínu, změna počtu nebo odstranění).
 
@@ -463,7 +451,6 @@ Tato informace nám umožní tyto podpoložky v objednávce skrýt a navíc ji p
 	\centering
 	\caption[Časová náročnost úkolu na vázané produkty]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -476,7 +463,6 @@ Tato informace nám umožní tyto podpoložky v objednávce skrýt a navíc ji p
             Celkem  & 32h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 
@@ -484,9 +470,9 @@ Tato informace nám umožní tyto podpoložky v objednávce skrýt a navíc ji p
 
 Výdej produktů na akci (respektive příjem produktů z akce) probíhá skenováním kódů jednotlivých položek. Tyto kódy se pak propisují do příjmových / výdejových protokolů.
 
-Pokud ale potřebujeme vydat určitou skupinu produktů bez nutnosti ručně skenovat kódy všech produktů v této skupině hodil by se nějaký mechanismus, který by toto při výdeji umožnil. Myšlenka je dovolit skladníkovi předem předvytvořit skupiny složené z libovolného počtu produktů, vygenerovat si unikátní kód této skupiny a při výdeji naskenovat pouze tento jeden kód, který vložení všech produktů zajistí. 
+Pokud ale potřebujeme vydat určitou skupinu produktů bez nutnosti ručně skenovat kódy všech produktů v této skupině hodil by se nějaký mechanismus, který by toto při výdeji umožnil. Myšlenka je dovolit skladníkovi předem vytvořit skupiny složené z libovolného počtu produktů, vygenerovat si unikátní kód této skupiny a při výdeji naskenovat pouze tento jeden kód, který vložení všech produktů zajistí. 
 
-Použití v praxi může být např. přepravka kabelů. Každý kabel má svůj fyzický kód, ale kód na přepravce nám zajistí jednoduché přnesení celého jejího obsahu do příjmových / výdejových protokolů.
+Použití v praxi může být např. přepravka kabelů. Každý kabel má svůj fyzický kód, ale kód na přepravce nám zajistí jednoduché přeneseni celého jejího obsahu do příjmových / výdejových protokolů.
 
 \subsection{Analýza problému}
 
@@ -499,7 +485,7 @@ Použití v praxi může být např. přepravka kabelů. Každý kabel má svůj
 
 \subsection{Implementace}
 
-Úkol jsem začal řešit opět návrhem jednoduché databázové struktury, implementace tabulky pro výpis a formulářem pro přidávání a editaci skupin. Pro správu položek ve skupině jsem vytvořil React komponentu obsahující skener a výpis položek s možností odstranění. Po úspěsném načtení je kód odeslán na API a následně jsou opět přes API znovunačteny položky k zobrazení.
+Úkol jsem začal řešit opět návrhem jednoduché databázové struktury, implementace tabulky pro výpis a formulářem pro přidávání a editaci skupin. Pro správu položek ve skupině jsem vytvořil React komponentu obsahující skener a výpis položek s možností odstranění. Po úspěšném načtení je kód odeslán na API a následně jsou opět přes API znovu načteny položky k zobrazení.
 
 \begin{lstlisting}[label=src:ProductGroupScanner.js,caption={React komponenta pro správu a zobrazení položek ve skupině}]
 
@@ -601,9 +587,9 @@ export const ProductGroupScanner = (props) => {
 
 
 Druhou částí úkolu bylo správně rozpoznání nově generovaných kódů při výdeji / příjmu. 
-Pokud metoda rozpoznávající odeslaný QR kód nenašla žádný odpovícající produkt, je vyhozena chyba která je následně zobrazena uživateli. Upravil jsem logiku tak, aby v případě že daný kód nenáleží žádnému produktu se aplikace před vyhozením chyby jako alternativní možnost pokusila vyhledat jestli se nejedná o kód skupiny. V případě že ano, přenese se zpracování do nově vytvořené metody.
+Pokud metoda rozpoznávající odeslaný QR kód nenašla žádný odpovídající produkt, je vyhozena chyba která je následně zobrazena uživateli. Upravil jsem logiku tak, aby v případě že daný kód nenáleží žádnému produktu se aplikace před vyhozením chyby jako alternativní možnost pokusila vyhledat jestli se nejedná o kód skupiny. V případě že ano, přenese se zpracování do nově vytvořené metody.
 
-Tato metoda načte všechny produkty ve skupině a následně se formou transakce pokusí do protokolu postupně přidávat jeden po druhém. Přidání jednotlivých produktů už je řešeno stejnou metodou jako kdyby byl tento produkt naskenován přímo. Pokud při zpracování produktu dojde k chybě (produkt byl již vydán, není dostupný, byl vyřazen apod.) je tato chyba předáná uživateli a transakce se vrátí zpět do původního stavu (rollback) jako by nebyl přidán žádný produkt. 
+Tato metoda načte všechny produkty ve skupině a následně se formou transakce pokusí do protokolu postupně přidávat jeden po druhém. Přidání jednotlivých produktů už je řešeno stejnou metodou jako kdyby byl tento produkt naskenován přímo. Pokud při zpracování produktu dojde k chybě (produkt byl již vydán, není dostupný, byl vyřazen apod.) je tato chyba předána uživateli a transakce se vrátí zpět do původního stavu (rollback) jako by nebyl přidán žádný produkt. 
 
 
 \begin{table}
@@ -628,7 +614,7 @@ Tato metoda načte všechny produkty ve skupině a následně se formou transakc
 
 \section{Oprávnění uživatelů}
 
-S rostoucím počtem funkcí v systému chceme, aby některé funkcionality zůstaly vybraným uživatelům skryty. Může to být jak z bezpečnostních důvodů (ne všichni uživatelé mají oprávnění vydávat zboží ze skladu) tak z důvodu zachování jednoduchosti systému (čím méně nepotřebných možností uživatel v systému uvidí, tím se může celá aplikace jevit snažší na ovládání).
+S rostoucím počtem funkcí v systému chceme, aby některé funkcionality zůstaly vybraným uživatelům skryty. Může to být jak z bezpečnostních důvodů (ne všichni uživatelé mají oprávnění vydávat zboží ze skladu) tak z důvodu zachování jednoduchosti systému (čím méně nepotřebných možností uživatel v systému uvidí, tím se může celá aplikace jevit snazší na ovládání).
 
 Každý uživatel v systému figuruje v jedné ze třech rolí (administrátor, skladník, uživatel). Nová funkce by ale kromě tohoto základního dělení měla umožnit u každého uživatel určit ke kterým z vybraných funkcí bude mít přístup nezávisle na jeho roli.
 
@@ -641,7 +627,7 @@ Vybrané volitelné funkcionality dostupné pro uživatele:
     \item Příjem na sklad
     \item Manuální příjem na sklad (bez skenování QR)
     \item Audit produktu
-    \item Zobrazení skladovýc zásob
+    \item Zobrazení skladových zásob
     \item Zobrazení pořizovacích cen produktů
     \item Inventura
     \item Skener produktů
@@ -692,7 +678,7 @@ WHERE role = 'admin';
 
 \subsection{Oprávnění}
 
-Pro každou funkci bylo nutné v systému najít konkrétní místa, kde je potřeba použití této funkce omezit. Bylo nutné ošetřit vždy zobrazení tlačítek pro použití a zároveň i přímo přístup k funkci (aby uživatel který to nemá povoleno nemohl přístoupit k výdeji položek zadáním správné URL adresy).
+Pro každou funkci bylo nutné v systému najít konkrétní místa, kde je potřeba použití této funkce omezit. Bylo nutné ošetřit vždy zobrazení tlačítek pro použití a zároveň i přímo přístup k funkci (aby uživatel který to nemá povoleno nemohl přistoupit k výdeji položek zadáním správné URL adresy).
 
 Ve většině případů již byl přístup omezen pomocí role, stačilo tedy většinou nahradit stávající podmínku na roli za novou podmínku přímo na konkrétní funkci.
 
@@ -700,7 +686,6 @@ Ve většině případů již byl přístup omezen pomocí role, stačilo tedy v
 	\centering
 	\caption[Časová náročnost úkolu na oprávnění]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -713,12 +698,11 @@ Ve většině případů již byl přístup omezen pomocí role, stačilo tedy v
             Celkem  & 48h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 \section{Tiskové sestavy}
 
-Aplikace umpožňuje ke každé objednávce generovat několik různých tiskových sestav. Vygenerovaná tisková sestava ale vždy reflektuje aktuální stav objednávky. Při každé změně objednávky (datumy, položky, ceny) se změna propíše také do samotné tiskové sestavy. Bylo by lepší, kdyby se každá sestava v moment vystavení uložila jako nezávislý PDF dokument, který si je možné zpětně zobrazit nebo stáhnout. Vždy ale dostaneme stejný dokument, nezávislý na stavu databáze.
+Aplikace umožňuje ke každé objednávce generovat několik různých tiskových sestav. Vygenerovaná tisková sestava ale vždy reflektuje aktuální stav objednávky. Při každé změně objednávky (data, položky, ceny) se změna propíše také do samotné tiskové sestavy. Bylo by lepší, kdyby se každá sestava v moment vystavení uložila jako nezávislý PDF dokument, který si je možné zpětně zobrazit nebo stáhnout. Vždy ale dostaneme stejný dokument, nezávislý na stavu databáze.
 
 \subsection{Analýza problému}
 
@@ -742,7 +726,6 @@ Na základě záznamů v nově vzniklé tabulce bylo možní připravit novou ka
 	\centering
 	\caption[Časová náročnost úkolu na dokumenty]{Shrnutí časové náročnosti úkolu}
 	\label{tab:TopLevelTableLabel}
-	{
 		\begin{tabular}{lr}
 			\toprule
 			Dílčí část & Čas\\
@@ -754,7 +737,6 @@ Na základě záznamů v nově vzniklé tabulce bylo možní připravit novou ka
             Celkem  & 28h \\
 			\midrule
 		\end{tabular}
-	}
 \end{table}
 
 
@@ -767,7 +749,7 @@ Na základě záznamů v nově vzniklé tabulce bylo možní připravit novou ka
 
 \section{Historie objednávek}
 
-Objednávky a její položky se v systému často mění. K objednávce má částo přístup více uživatelů jak ze strany zákazníka tak ze strany skladu. Aby bylo možné zpětně dohledat kdo kterou změnu provedl, zavedli jsme funkci pro sledování historie. 
+Objednávky a její položky se v systému často mění. K objednávce má často přístup více uživatelů jak ze strany zákazníka tak ze strany skladu. Aby bylo možné zpětně dohledat kdo kterou změnu provedl, zavedli jsme funkci pro sledování historie. 
 
 \subsection{Analýza problému}
 
@@ -783,25 +765,25 @@ Objednávky a její položky se v systému často mění. K objednávce má čá
 Nejprve bylo potřeba vyřešit formu ukládání dat o změnách do databáze. Vznikla nová tabulka, ve které každý řádek reprezentuje jednu konkrétní událost. Struktura tabulky je následující:
 
 \begin{itemize}
-    \item activity\_id - ID aktivity (primární klíč)
-    \item user\_id - ID uživatele
-    \item order\_id - ID objednávky
-    \item product\_id - ID produktu, kterého se změna týká (může být NULL)
-    \item created\_at - datum vytvoření
-    \item type - typ události (viz. níže)
-    \item description - popis události
+    \item activity\_id -- ID aktivity (primární klíč)
+    \item user\_id -- ID uživatele
+    \item order\_id -- ID objednávky
+    \item product\_id -- ID produktu, kterého se změna týká (může být NULL)
+    \item created\_at -- datum vytvoření
+    \item type -- typ události (viz. níže)
+    \item description -- popis události
 \end{itemize}
 
 Sloupec description obsahuje textový popis události včetně bližšího popisu změny (např. změna počtu kusů u produkty XYZ z 3 ks na 6 ks). Sloupec type může nabývat jedné z následujících hodnot a tato hodnota je pak potřebná pro filtrování událostí.
 
 \begin{itemize}
-    \item order\_created - objednávka byla vytvořena
-    \item order\_edited - údaje o objednávce byly změněny
-    \item order\_date\_changed - termín objednávky byl změněn
-    \item product\_quantity\_changed - změna počtu kusů u položky
+    \item order\_created -- objednávka byla vytvořena
+    \item order\_edited -- údaje o objednávce byly změněny
+    \item order\_date\_changed -- termín objednávky byl změněn
+    \item product\_quantity\_changed -- změna počtu kusů u položky
 \end{itemize}
 
-Do takto předpřipravené tabulky bude možné jednoduše veškeré změny zaznamenávat.
+Do takto připravené tabulky bude možné jednoduše veškeré změny zaznamenávat.
 
 \subsection{Implementace}
 

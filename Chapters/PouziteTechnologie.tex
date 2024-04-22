@@ -3,14 +3,14 @@ Tato kapitola se zaměřuje na popis technologií, které využívá buďto samo
 
 \section{Nette framework}
 
-Nette je český framework usnadňující tvorbu aplikací v PHP. Je klasickým příkladem použití architektury MVP (Model - View - Presenter). \cite{nette-itnetwork} Framework se skládá z několika balíků a každý z nich řeší okruh problémů v určité oblasti. Programátor si může zvolit, které balíky bude využívat a které naopak ne. 
-Seznam použitých balíků z Nette:
+Nette je český framework usnadňující tvorbu aplikací v PHP. Je klasickým příkladem použití architektury MVP (Model - View - Presenter) \cite{nette-itnetwork}.  Framework se skládá z~několika balíků a každý z nich řeší okruh problémů v určité oblasti. Programátor si může zvolit, které balíky bude využívat a~které naopak ne. 
+Seznam stěžejních balíků použitých z frameworku Nette:
 \begin{itemize}
-  \item Nette DI Container - návrhový vzor Dependency Injection
-  \item Nette Database - vrstva zajišťující komunikaci s databází
-  \item Nette Forms - generování uživatelských formulářů
-  \item Nette Mail - obaluje funkcionalitu týkající se odesílání e-mailů
-  \item a další..
+  \item Nette DI Container -- návrhový vzor Dependency Injection
+  \item Nette Database -- vrstva zajišťující komunikaci s databází
+  \item Nette Forms -- generování uživatelských formulářů
+  \item Nette Mail -- obaluje funkcionalitu týkající se odesílání e-mailů.
+
 \end{itemize}
 
 \section{MySql databáze}
@@ -21,8 +21,7 @@ K trvalému ukládání dat je využita relační MySql databáze. Výhodou zde 
 Vyvíjená aplikace má poměrně pevně daný databázový model, který se v čase příliš nemění a je tedy vhodný pro použití relační databáze. Dalším důvodem byl i fakt, že MySql je open-source a také nabídka českých hostingů, které standardně nabízí hostingové řešení právě v kombinaci PHP a MySql.
 
 \section{React}
-
-React je javascriptová knihovna pro tvorbu dynamických uživatelských rozhraní vyvíjená společností Meta. \cite{react} Funguje na principu logických komponent (např. tlačítka, vyskakovací okna) které do sebe lze zanořovat a tvořit tak celou strukturu aplikace. Hlavním benefitem tohoto přístupu je znovupoužitelnost vytvořených komponent.
+React je javascriptová knihovna pro tvorbu dynamických uživatelských rozhraní vyvíjená společností Meta \cite{react}.  Funguje na principu logických komponent (např. tlačítka, vyskakovací okna) které do sebe lze zanořovat a tvořit tak celou strukturu aplikace. Hlavním benefitem tohoto přístupu je znovupoužitelnost vytvořených komponent.
 
 React nebyl součástí používaných technologií od úplného začátku vývoje. Při zavedení Reactu nebylo nutné hned veškeré dosud funkční rozhraní přepisovat do komponent, ale bylo možné nově vzniklé komponenty snadno implementovat do existujících částí aplikace.
 
@@ -32,7 +31,7 @@ Ke správě verzí je využíván verzovací nástroj Git. Jeho použití při v
 
 \subsection{Github Actions}
 
-Aby nebylo nutné kód při každé aktualizaci ručně nahrávat na produkční server a zároveň bylo zajištěno že budou při každém nahrání provedený všechny operace korektě, je na Githubu nastaven skript, který se spustí při každém nahrání do repozitáře (push). Tento skript dočasně znepřístupní celý systém, nahraje automaticky veškeré změněné soubory na webový server a zajistí vymazání dočasných souborů a nakonec systém opět zpřístupní.
+Aby nebylo nutné kód při každé aktualizaci ručně nahrávat na produkční server a zároveň bylo zajištěno že budou při každém nahrání provedený všechny operace korektně, je na Githubu nastaven skript, který se spustí při každém nahrání do repozitáře (push). Tento skript dočasně znepřístupní celý systém, nahraje automaticky veškeré změněné soubory na webový server a zajistí vymazání dočasných souborů a nakonec systém opět zpřístupní.
 
 
 \section{mPDF}
